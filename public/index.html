@@ -1,0 +1,1159 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Management System - Full CRUD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #e9ecef;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .nav-tab:hover {
+            background: #dee2e6;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Sales Management System</h1>
+            <p>Complete CRUD Operations - Insert, Update, Delete, Search</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('customers')">👥 Customers</button>
+            <button class="nav-tab" onclick="showSection('cashiers')">💵 Cashiers</button>
+            <button class="nav-tab" onclick="showSection('products')">📦 Products</button>
+            <button class="nav-tab" onclick="showSection('suppliers')">🏭 Suppliers</button>
+            <button class="nav-tab" onclick="showSection('sales')">🛍️ Sales</button>
+        </div>
+
+        <div class="content">
+            <div id="message" class="message"></div>
+
+            <!-- CUSTOMERS SECTION -->
+            <div id="customers" class="section active">
+                <h2>Customer Management</h2>
+                
+                <div class="search-bar">
+                    <input type="text" id="searchCustomer" placeholder="🔍 Search customers...">
+                    <button class="btn btn-primary" onclick="searchCustomers()">Search</button>
+                    <button class="btn btn-success" onclick="openModal('customerModal')">+ Add New</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CASHIERS SECTION -->
+            <div id="cashiers" class="section">
+                <h2>Cashier Management</h2>
+                
+                <div class="search-bar">
+                    <input type="text" id="searchCashier" placeholder="🔍 Search cashiers...">
+                    <button class="btn btn-primary" onclick="searchCashiers()">Search</button>
+                    <button class="btn btn-success" onclick="openModal('cashierModal')">+ Add New</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="cashiersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PRODUCTS SECTION -->
+            <div id="products" class="section">
+                <h2>Product Management</h2>
+                
+                <div class="search-bar">
+                    <input type="text" id="searchProduct" placeholder="🔍 Search products...">
+                    <button class="btn btn-primary" onclick="searchProducts()">Search</button>
+                    <button class="btn btn-success" onclick="openModal('productModal')">+ Add New</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Description</th>
+                                <th>Supplier</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUPPLIERS SECTION -->
+            <div id="suppliers" class="section">
+                <h2>Supplier Management</h2>
+                
+                <div class="search-bar">
+                    <input type="text" id="searchSupplier" placeholder="🔍 Search suppliers...">
+                    <button class="btn btn-primary" onclick="searchSuppliers()">Search</button>
+                    <button class="btn btn-success" onclick="openModal('supplierModal')">+ Add New</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="suppliersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Supplier Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SALES SECTION -->
+            <div id="sales" class="section">
+                <h2>Sales Management</h2>
+                
+                <div class="search-bar">
+                    <input type="text" id="searchSale" placeholder="🔍 Search sales...">
+                    <button class="btn btn-primary" onclick="searchSales()">Search</button>
+                    <button class="btn btn-success" onclick="openModal('saleModal')">+ Add New</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>Sale ID</th>
+                                <th>Customer</th>
+                                <th>Cashier</th>
+                                <th>Product(s)</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('customerModal')">&times;</span>
+                <h2 id="customerModalTitle">Add Customer</h2>
+            </div>
+            <form id="customerForm">
+                <input type="hidden" id="customerId">
+                <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" id="custFname" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name *</label>
+                    <input type="text" id="custLname" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('customerModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cashier Modal -->
+    <div id="cashierModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('cashierModal')">&times;</span>
+                <h2 id="cashierModalTitle">Add Cashier</h2>
+            </div>
+            <form id="cashierForm">
+                <input type="hidden" id="cashierId">
+                <div class="form-group">
+                    <label>First Name *</label>
+                    <input type="text" id="cashierFname" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name *</label>
+                    <input type="text" id="cashierLname" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('cashierModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supplier Modal -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('supplierModal')">&times;</span>
+                <h2 id="supplierModalTitle">Add Supplier</h2>
+            </div>
+            <form id="supplierForm">
+                <input type="hidden" id="supplierId">
+                <div class="form-group">
+                    <label>Supplier Name *</label>
+                    <input type="text" id="supplierDec" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('supplierModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('productModal')">&times;</span>
+                <h2 id="productModalTitle">Add Product</h2>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                <div class="form-group">
+                    <label>Product Description *</label>
+                    <input type="text" id="prodDesc" required>
+                </div>
+                <div class="form-group">
+                    <label>Supplier *</label>
+                    <select id="productSupplier" required>
+                        <option value="">Select Supplier</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('productModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sale Modal -->
+    <div id="saleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('saleModal')">&times;</span>
+                <h2 id="saleModalTitle">Add Sale</h2>
+            </div>
+            <form id="salesForm">
+                <input type="hidden" id="saleId">
+                <div class="form-group">
+                    <label>Customer *</label>
+                    <select id="saleCustomer" required>
+                        <option value="">Select Customer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cashier *</label>
+                    <select id="saleCashier" required>
+                        <option value="">Select Cashier</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Product *</label>
+                    <select id="saleProduct" required>
+                        <option value="">Select Product</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Sale Date *</label>
+                    <input type="date" id="saleDate" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('saleModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let currentEditId = null;
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+            
+            if (modalId === 'productModal') {
+                loadSuppliersDropdown();
+            } else if (modalId === 'saleModal') {
+                loadSalesDropdowns();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            currentEditId = null;
+            
+            const forms = ['customerForm', 'cashierForm', 'supplierForm', 'productForm', 'salesForm'];
+            forms.forEach(formId => {
+                const form = document.getElementById(formId);
+                if (form) form.reset();
+            });
+            
+            // Reset modal titles
+            document.getElementById('customerModalTitle').textContent = 'Add Customer';
+            document.getElementById('cashierModalTitle').textContent = 'Add Cashier';
+            document.getElementById('supplierModalTitle').textContent = 'Add Supplier';
+            document.getElementById('productModalTitle').textContent = 'Add Product';
+            document.getElementById('saleModalTitle').textContent = 'Add Sale';
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+            
+            loadData(sectionId);
+        }
+
+        // Message Display
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type} show`;
+            setTimeout(() => {
+                messageDiv.classList.remove('show');
+            }, 3000);
+        }
+
+        // Load Data
+        async function loadData(section) {
+            try {
+                switch(section) {
+                    case 'customers':
+                        await loadCustomers();
+                        break;
+                    case 'cashiers':
+                        await loadCashiers();
+                        break;
+                    case 'products':
+                        await loadProducts();
+                        break;
+                    case 'suppliers':
+                        await loadSuppliers();
+                        break;
+                    case 'sales':
+                        await loadSales();
+                        break;
+                }
+            } catch (error) {
+                showMessage('Error loading data: ' + error.message, 'error');
+            }
+        }
+
+        // ==================== CUSTOMERS ====================
+        async function loadCustomers() {
+            const response = await fetch(`${API_URL}/customers`);
+            const customers = await response.json();
+            displayCustomers(customers);
+        }
+
+        function displayCustomers(customers) {
+            const tbody = document.querySelector('#customersTable tbody');
+            tbody.innerHTML = customers.map(c => `
+                <tr>
+                    <td>${c.CustID}</td>
+                    <td>${c.CustFname}</td>
+                    <td>${c.CustLname}</td>
+                    <td class="action-btns">
+                        <button class="btn btn-warning btn-sm" onclick="editCustomer(${c.CustID})">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${c.CustID})">🗑️ Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function searchCustomers() {
+            const term = document.getElementById('searchCustomer').value;
+            if (!term) {
+                loadCustomers();
+                return;
+            }
+            const response = await fetch(`${API_URL}/customers/search/${term}`);
+            const customers = await response.json();
+            displayCustomers(customers);
+        }
+
+        async function editCustomer(id) {
+            const response = await fetch(`${API_URL}/customers/${id}`);
+            const customer = await response.json();
+            
+            document.getElementById('customerId').value = id;
+            document.getElementById('custFname').value = customer.CustFname;
+            document.getElementById('custLname').value = customer.CustLname;
+            document.getElementById('customerModalTitle').textContent = 'Edit Customer';
+            
+            openModal('customerModal');
+        }
+
+        async function deleteCustomer(id) {
+            if (!confirm('Are you sure you want to delete this customer?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/customers/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                showMessage(result.message, 'success');
+                loadCustomers();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('customerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('customerId').value;
+            const data = {
+                fname: document.getElementById('custFname').value,
+                lname: document.getElementById('custLname').value
+            };
+            
+            try {
+                const url = id ? `${API_URL}/customers/${id}` : `${API_URL}/customers`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showMessage(result.message, 'success');
+                closeModal('customerModal');
+                loadCustomers();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== CASHIERS ====================
+        async function loadCashiers() {
+            const response = await fetch(`${API_URL}/cashiers`);
+            const cashiers = await response.json();
+            displayCashiers(cashiers);
+        }
+
+        function displayCashiers(cashiers) {
+            const tbody = document.querySelector('#cashiersTable tbody');
+            tbody.innerHTML = cashiers.map(c => `
+                <tr>
+                    <td>${c.CashierId}</td>
+                    <td>${c.CashierFname}</td>
+                    <td>${c.CashierLname}</td>
+                    <td class="action-btns">
+                        <button class="btn btn-warning btn-sm" onclick="editCashier(${c.CashierId})">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCashier(${c.CashierId})">🗑️ Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function searchCashiers() {
+            const term = document.getElementById('searchCashier').value;
+            if (!term) {
+                loadCashiers();
+                return;
+            }
+            const response = await fetch(`${API_URL}/cashiers/search/${term}`);
+            const cashiers = await response.json();
+            displayCashiers(cashiers);
+        }
+
+        async function editCashier(id) {
+            const response = await fetch(`${API_URL}/cashiers/${id}`);
+            const cashier = await response.json();
+            
+            document.getElementById('cashierId').value = id;
+            document.getElementById('cashierFname').value = cashier.CashierFname;
+            document.getElementById('cashierLname').value = cashier.CashierLname;
+            document.getElementById('cashierModalTitle').textContent = 'Edit Cashier';
+            
+            openModal('cashierModal');
+        }
+
+        async function deleteCashier(id) {
+            if (!confirm('Are you sure you want to delete this cashier?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/cashiers/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                showMessage(result.message, 'success');
+                loadCashiers();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        document.getElementById('cashierForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('cashierId').value;
+            const data = {
+                fname: document.getElementById('cashierFname').value,
+                lname: document.getElementById('cashierLname').value
+            };
+            
+            try {
+                const url = id ? `${API_URL}/cashiers/${id}` : `${API_URL}/cashiers`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showMessage(result.message, 'success');
+                closeModal('cashierModal');
+                loadCashiers();
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        });
+
+        // ==================== SUPPLIERS ====================
+        async function loadSuppliers() {
+            const response = await fetch(`${API_URL}/suppliers`);
+            const suppliers = await response.json();
+            displaySuppliers(suppliers);
+        }
+
+        function displaySuppliers(suppliers) {
+            const tbody = document.querySelector('#suppliersTable tbody');
+            tbody.innerHTML = suppliers.map(s => `
+                <tr>
+                    <td>${s.SupplierId}</td>
+                    <td>${s.SupplierDEC}</td>
+                    <td class="action-btns">
+                        <button class="btn btn-warning btn-sm" onclick="editSupplier(${s.SupplierId})">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteSupplier(${s.SupplierId})">🗑️ Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function searchSuppliers() {
+            const term = document.getElementById('searchSupplier').value;
+            if (!term) {
+                loadSuppliers();
+                return;
+            }
+            const response = await fetch(`${API_URL}/suppliers/search/${term}`);
+            const suppliers = await response.json();
+            displaySuppliers(suppliers);
+        }
+
+        async function editSupplier(id) {
+            const response = await fetch(`${API_URL}/suppliers/${id}`);
+            const supplier = await response.json();
+            
+            document.getElementById('supplierId').value = id;
+            document.getElementById('supplierDec').value = supplier.SupplierDEC;
+            document.getElementById('supplierModalTitle').textContent = 'Edit Supplier';
+            
+            openModal('supplierModal');
+        }
+
+        async function deleteSupplier(id) {
+            if (!confirm('Are you sure you want to delete this supplier?')) return;
+
+try {
+            const response = await fetch(`${API_URL}/suppliers/${id}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            showMessage(result.message, 'success');
+            loadSuppliers();
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    document.getElementById('supplierForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('supplierId').value;
+        const data = {
+            name: document.getElementById('supplierDec').value
+        };
+        
+        try {
+            const url = id ? `${API_URL}/suppliers/${id}` : `${API_URL}/suppliers`;
+            const method = id ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            showMessage(result.message, 'success');
+            closeModal('supplierModal');
+            loadSuppliers();
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    });
+
+    // ==================== PRODUCTS ====================
+    async function loadProducts() {
+        const response = await fetch(`${API_URL}/products`);
+        const products = await response.json();
+        displayProducts(products);
+    }
+
+    function displayProducts(products) {
+        const tbody = document.querySelector('#productsTable tbody');
+        tbody.innerHTML = products.map(p => `
+            <tr>
+                <td>${p.ProductID}</td>
+                <td>${p.ProdDESC}</td>
+                <td>${p.SupplierName || 'N/A'}</td>
+                <td class="action-btns">
+                    <button class="btn btn-warning btn-sm" onclick="editProduct(${p.ProductID})">✏️ Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.ProductID})">🗑️ Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function searchProducts() {
+        const term = document.getElementById('searchProduct').value;
+        if (!term) {
+            loadProducts();
+            return;
+        }
+        const response = await fetch(`${API_URL}/products/search/${term}`);
+        const products = await response.json();
+        displayProducts(products);
+    }
+
+    async function loadSuppliersDropdown() {
+        const response = await fetch(`${API_URL}/suppliers`);
+        const suppliers = await response.json();
+        const select = document.getElementById('productSupplier');
+        select.innerHTML = '<option value="">Select Supplier</option>' +
+            suppliers.map(s => `<option value="${s.SupplierId}">${s.SupplierDEC}</option>`).join('');
+    }
+
+    async function editProduct(id) {
+        const response = await fetch(`${API_URL}/products/${id}`);
+        const product = await response.json();
+        
+        await loadSuppliersDropdown();
+        
+        document.getElementById('productId').value = id;
+        document.getElementById('prodDesc').value = product.ProdDESC;
+        document.getElementById('productSupplier').value = product.SupplierID;
+        document.getElementById('productModalTitle').textContent = 'Edit Product';
+        
+        openModal('productModal');
+    }
+
+    async function deleteProduct(id) {
+        if (!confirm('Are you sure you want to delete this product?')) return;
+        
+        try {
+            const response = await fetch(`${API_URL}/products/${id}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            showMessage(result.message, 'success');
+            loadProducts();
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('productId').value;
+        const data = {
+            description: document.getElementById('prodDesc').value,
+            supplierId: document.getElementById('productSupplier').value
+        };
+        
+        try {
+            const url = id ? `${API_URL}/products/${id}` : `${API_URL}/products`;
+            const method = id ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            showMessage(result.message, 'success');
+            closeModal('productModal');
+            loadProducts();
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    });
+
+    // ==================== SALES ====================
+    async function loadSales() {
+        const response = await fetch(`${API_URL}/sales`);
+        const sales = await response.json();
+        displaySales(sales);
+    }
+
+    function displaySales(sales) {
+        const tbody = document.querySelector('#salesTable tbody');
+        tbody.innerHTML = sales.map(s => `
+            <tr>
+                <td>${s.SalesId}</td>
+                <td>${s.CustomerName}</td>
+                <td>${s.CashierName}</td>
+                <td>${s.ProductName || 'N/A'}</td>
+                <td>${s.Sales_Date}</td>
+                <td class="action-btns">
+                    <button class="btn btn-warning btn-sm" onclick="editSale(${s.SalesId})">✏️ Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSale(${s.SalesId})">🗑️ Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function searchSales() {
+        const term = document.getElementById('searchSale').value;
+        if (!term) {
+            loadSales();
+            return;
+        }
+        const response = await fetch(`${API_URL}/sales/search/${term}`);
+        const sales = await response.json();
+        displaySales(sales);
+    }
+
+    async function loadSalesDropdowns() {
+        const [customers, cashiers, products] = await Promise.all([
+            fetch(`${API_URL}/customers`).then(r => r.json()),
+            fetch(`${API_URL}/cashiers`).then(r => r.json()),
+            fetch(`${API_URL}/products`).then(r => r.json())
+        ]);
+
+        document.getElementById('saleCustomer').innerHTML = 
+            '<option value="">Select Customer</option>' +
+            customers.map(c => `<option value="${c.CustID}">${c.CustFname} ${c.CustLname}</option>`).join('');
+
+        document.getElementById('saleCashier').innerHTML = 
+            '<option value="">Select Cashier</option>' +
+            cashiers.map(c => `<option value="${c.CashierId}">${c.CashierFname} ${c.CashierLname}</option>`).join('');
+
+        document.getElementById('saleProduct').innerHTML = 
+            '<option value="">Select Product</option>' +
+            products.map(p => `<option value="${p.ProductID}">${p.ProdDESC}</option>`).join('');
+    }
+
+    async function editSale(id) {
+        const response = await fetch(`${API_URL}/sales/${id}`);
+        const sale = await response.json();
+        
+        await loadSalesDropdowns();
+        
+        document.getElementById('saleId').value = id;
+        document.getElementById('saleCustomer').value = sale.CustID;
+        document.getElementById('saleCashier').value = sale.CashierID;
+        
+        if (sale.ProductIDs) {
+            const productId = sale.ProductIDs.split(',')[0];
+            document.getElementById('saleProduct').value = productId;
+        }
+        
+        document.getElementById('saleDate').value = sale.Sales_Date;
+        document.getElementById('saleModalTitle').textContent = 'Edit Sale';
+        
+        openModal('saleModal');
+    }
+
+    async function deleteSale(id) {
+        if (!confirm('Are you sure you want to delete this sale?')) return;
+        
+        try {
+            const response = await fetch(`${API_URL}/sales/${id}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            showMessage(result.message, 'success');
+            loadSales();
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    document.getElementById('salesForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('saleId').value;
+        const data = {
+            customerId: document.getElementById('saleCustomer').value,
+            cashierId: document.getElementById('saleCashier').value,
+            productId: document.getElementById('saleProduct').value,
+            date: document.getElementById('saleDate').value
+        };
+        
+        try {
+            const url = id ? `${API_URL}/sales/${id}` : `${API_URL}/sales`;
+            const method = id ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            showMessage(result.message, 'success');
+            closeModal('saleModal');
+            loadSales();
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    });
+
+    // Set today's date as default
+    document.getElementById('saleDate').valueAsDate = new Date();
+
+    // Initial load
+    loadData('customers');
+</script>
